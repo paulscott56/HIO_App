@@ -7,7 +7,9 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends FragmentActivity {
+import hackaday.io.hackadayio.fragments.FeedsFragment;
+
+public class MainActivity extends FragmentActivity implements FeedsFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "Main";
 
@@ -53,4 +55,8 @@ public class MainActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onFragmentInteraction(String id) {
+
+    }
 }
