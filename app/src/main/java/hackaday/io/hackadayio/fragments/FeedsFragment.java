@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -34,14 +35,16 @@ import hackaday.io.hackadayio.R;
 import hackaday.io.hackadayio.data.Feed;
 import hackaday.io.hackadayio.data.FeedContent;
 import hackaday.io.hackadayio.data.FeedItem;
+import hackaday.io.hackadayio.data.FeedsArrayAdapter;
 import hackaday.io.hackadayio.data.InfiniteScrollListener;
 
 /**
  * Created by paul on 2015/07/10.
  */
-public class FeedsFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class FeedsFragment extends Fragment {
 
     private static final String TAG = "Feeds";
+    private static final int REFRESH_ID = 1;
     private TextView txtDisplay;
     private Context appContext;
     private List<Feed> feeds;
@@ -53,11 +56,13 @@ public class FeedsFragment extends Fragment implements AbsListView.OnItemClickLi
     private AbsListView mListView;
     private ListAdapter mAdapter;
     private OnFragmentInteractionListener mListener;
-
-
+    FeedsArrayAdapter adapter;
+    ArrayList<FeedItem> feedItems;
+    ListView listView;
 
     public FeedsFragment() {
     }
+
 
 
     @Override
@@ -80,14 +85,6 @@ public class FeedsFragment extends Fragment implements AbsListView.OnItemClickLi
         return view;
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(FeedContent.ITEMS.get(position).id);
-        }
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,6 +94,20 @@ public class FeedsFragment extends Fragment implements AbsListView.OnItemClickLi
         initializeData();
         mAdapter = new ArrayAdapter<FeedItem>(getActivity(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, FeedContent.ITEMS);
+
+        feedItems = new ArrayList<>();
+        adapter = new FeedsArrayAdapter(getActivity().getApplicationContext(), feedItems);
+
+        listView = new ListView(getActivity().getApplicationContext());
+        listView.setAdapter(adapter);
+        getActivity().setContentView(listView);
+
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        menu.add(0, REFRESH_ID, 0, "refresh");
+        return true;
 
     }
 
@@ -136,6 +147,7 @@ public class FeedsFragment extends Fragment implements AbsListView.OnItemClickLi
                             e.printStackTrace();
                         }
                         //Log.i(TAG, data.toString(4));
+
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -198,5 +210,11 @@ public class FeedsFragment extends Fragment implements AbsListView.OnItemClickLi
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
+    }
+
+    @Override
+    public void onNewFeedItems(ArrayList<FeedItem> feedItems) {
+        adapter.addAll(feedItems);
+        adapter.notifyDataSetChanged();
     }
 }
