@@ -15,4 +15,16 @@
     <string name="messages">Messages</string>
     <string name="comments">Comments</string>
     <string name="search">Search</string>
+    <string name="updateprofile">has updated their profile</string>
+    <string name="projectSkull">gave a skull to project</string>
+    <string name="discussionsComment">wrote a comment on</string>
+    <string name="updatedetails">has updated the project</string>
+    <string name="newlog">has added a new project log for</string>
+    <string name="contributorsAdded">has added ? as a contributor to</string>
+    <string name="projectnew">has added a new project titled</string>
+    <string name="projectFollow">started following</string>
+    <string name="eventFollow">started following</string>
+    <string name="listFollow">started following</string>
+    <string name="discussionsCommentReply">replied to</string>
+    <string name="projectupdate">has updated the project titled</string>
 </resources>

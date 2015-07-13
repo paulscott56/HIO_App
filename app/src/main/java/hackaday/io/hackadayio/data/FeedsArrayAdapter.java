@@ -5,11 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import hackaday.io.hackadayio.R;
@@ -20,11 +21,11 @@ import hackaday.io.hackadayio.R;
 public class FeedsArrayAdapter extends ArrayAdapter<FeedItem> {
 
     Context context;
-    ArrayList<FeedItem> feedItems;
+    List<FeedItem> feedItems;
     Map<String,ViewHolder> viewholders;
 
-    public FeedsArrayAdapter(Context context, ArrayList<FeedItem> feedItems) {
-        super(context, R.layout.feed_item);
+    public FeedsArrayAdapter(Context context, List<FeedItem> feedItems) {
+        super(context, R.layout.feed_item, feedItems);
         this.context = context;
         this.feedItems = feedItems;
         this.viewholders = new HashMap<>();
@@ -46,30 +47,32 @@ public class FeedsArrayAdapter extends ArrayAdapter<FeedItem> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        FeedItem n = feedItems.get(position);
-
         ViewHolder viewHolder;
-        if(viewholders.get(position) != null) {
 
-            viewHolder = viewholders.get(position);
-
-        } else {
-
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if(convertView == null) {
+            // inflate the GridView item layout
+            LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.feed_item, parent, false);
 
+            // initialize the view holder
             viewHolder = new ViewHolder();
             viewHolder.labelView = (TextView) convertView.findViewById(R.id.label);
             viewHolder.valueView = (TextView) convertView.findViewById(R.id.value);
-
-            viewholders.put(String.valueOf(position), viewHolder);
-
+            viewHolder.avatar = (ImageView) convertView.findViewById(R.id.avatar);
+            convertView.setTag(viewHolder);
+        } else {
+            // recycle the already inflated view
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.labelView.setText(n.getId());
-        viewHolder.valueView.setText(n.getContent().toString());
+        // update the item view
+        FeedItem item = getItem(position);
+        viewHolder.labelView.setText(item.getScreen_name() + " " + item.getUpdateType() + " " + item.getProjectId());
+        viewHolder.valueView.setText(item.getSummary());
+        viewHolder.avatar.setImageBitmap(item.getAvatar());
 
         return convertView;
+
 
     }
 
@@ -77,6 +80,7 @@ public class FeedsArrayAdapter extends ArrayAdapter<FeedItem> {
 
         public TextView labelView;
         public TextView valueView;
+        public ImageView avatar;
 
     }
 

@@ -55,8 +55,5 @@ public class MainActivity extends FragmentActivity implements FeedsFragment.OnFr
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onFragmentInteraction(String id) {
 
-    }
 }

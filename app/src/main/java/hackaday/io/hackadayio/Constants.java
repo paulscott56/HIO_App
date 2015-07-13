@@ -7,4 +7,6 @@ public class Constants {
     public static final String API_KEY = "fkXPcIluWCvA1YKY";
     public static final String FEED_URI = "https://api.hackaday.io/v1/feeds/global";
     public static final String FEED_URL = FEED_URI + "?api_key=" + API_KEY + "&page=";
+    public static final String PROJECT_URI = "https://api.hackaday.io/v1/projects/";
+
 }
