@@ -27,4 +27,5 @@
     <string name="listFollow">started following</string>
     <string name="discussionsCommentReply">replied to</string>
     <string name="projectupdate">has updated the project titled</string>
+    <string name="label">HackadayIO Account Manager</string>
 </resources>

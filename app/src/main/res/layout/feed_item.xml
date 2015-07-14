@@ -14,7 +14,7 @@
         android:contentDescription="TODO"
         android:src="@drawable/icon" />
 
-    <TextView
+    <!-- TextView
         android:id="@+id/value"
         android:layout_width="fill_parent"
         android:layout_height="26dip"
@@ -24,19 +24,18 @@
         android:ellipsize="marquee"
         android:singleLine="false"
         android:text="Description"
-        android:textSize="10sp" />
+        android:textSize="10sp" / -->
 
     <TextView
         android:id="@+id/label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/value"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_alignWithParentIfMissing="true"
         android:layout_toRightOf="@id/avatar"
         android:gravity="center_vertical"
-        android:text="Example application"
+        android:text="Example feed item"
         android:textSize="14sp" />
 
 </RelativeLayout>

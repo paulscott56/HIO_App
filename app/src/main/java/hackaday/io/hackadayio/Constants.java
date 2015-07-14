@@ -9,4 +9,6 @@ public class Constants {
     public static final String FEED_URL = FEED_URI + "?api_key=" + API_KEY + "&page=";
     public static final String PROJECT_URI = "https://api.hackaday.io/v1/projects/";
 
+    public static final String CONTENT_AUTHORITY = "hackaday.io.hackadayio.projectsyncadapter";
+
 }

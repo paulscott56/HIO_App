@@ -57,7 +57,7 @@ public class FeedsArrayAdapter extends ArrayAdapter<FeedItem> {
             // initialize the view holder
             viewHolder = new ViewHolder();
             viewHolder.labelView = (TextView) convertView.findViewById(R.id.label);
-            viewHolder.valueView = (TextView) convertView.findViewById(R.id.value);
+            //viewHolder.valueView = (TextView) convertView.findViewById(R.id.value);
             viewHolder.avatar = (ImageView) convertView.findViewById(R.id.avatar);
             convertView.setTag(viewHolder);
         } else {
@@ -68,7 +68,7 @@ public class FeedsArrayAdapter extends ArrayAdapter<FeedItem> {
         // update the item view
         FeedItem item = getItem(position);
         viewHolder.labelView.setText(item.getScreen_name() + " " + item.getUpdateType() + " " + item.getProjectId());
-        viewHolder.valueView.setText(item.getSummary());
+        //viewHolder.valueView.setText(item.getSummary());
         viewHolder.avatar.setImageBitmap(item.getAvatar());
 
         return convertView;
@@ -79,7 +79,7 @@ public class FeedsArrayAdapter extends ArrayAdapter<FeedItem> {
     private static class ViewHolder {
 
         public TextView labelView;
-        public TextView valueView;
+        //public TextView valueView;
         public ImageView avatar;
 
     }

@@ -145,7 +145,7 @@ public class FeedsFragment extends ListFragment {
                                 String type = itemdata.getString("type");
                                 String projectId = itemdata.getString("project_id");
 
-                                String projectName = getProjectName(projectId);
+                                getProjectName(projectId);
 
                                 String user2Id = itemdata.getString("user2_id");
                                 String postId = itemdata.getString("post_id");
@@ -174,7 +174,7 @@ public class FeedsFragment extends ListFragment {
                                 AsyncTask<String, Void, Bitmap> imgData = new ImageLoaderTask(appContext).execute(avatar_url);
                                 try {
                                     Bitmap bmp = imgData.get();
-                                    adapter.add(new FeedItem(id, screen_name, updateType, projectName, user2Id, postId, summary, userId, bmp));
+                                    adapter.add(new FeedItem(id, screen_name, updateType, pname, user2Id, postId, summary, userId, bmp));
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 } catch (ExecutionException e) {
@@ -203,6 +203,7 @@ public class FeedsFragment extends ListFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            Log.i(TAG, response.toString(4));
                             pname = response.getString("name");
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -263,14 +264,6 @@ public class FeedsFragment extends ListFragment {
                 return type;
         }
     }
-
-    public void loadMoreDataFromApi(int page) {
-
-        pageNumber += 1;
-        Log.i(TAG, "Fetching more... " + pageNumber);
-        fetchFeeds(Constants.FEED_URL + pageNumber);
-    }
-
 
     public interface OnFragmentInteractionListener {
     }
