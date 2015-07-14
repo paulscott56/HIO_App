@@ -1,14 +1,22 @@
 package hackaday.io.hackadayio.data;
 
-import java.io.InputStream;
+import android.util.Log;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by paul on 2015/07/14.
  */
 public class ProjectParser {
-    public List<Entry> parse(InputStream stream) {
-        return null;
+    private static final String TAG = "ProjectParser";
+
+    public List<Entry> parse(JSONObject stream) {
+        List<Entry> entries = new ArrayList<Entry>();
+
+        return entries;
     }
 
     /**

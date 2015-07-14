@@ -14,6 +14,15 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -96,6 +105,8 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final int COLUMN_CREATED = 17;
     public static final int COLUMN_UPDATED = 18;
     public static final int COLUMN_TAGS = 19;
+    private JSONObject projectsjson;
+    private RequestQueue queue;
 
 
     public ProjectSyncAdapter(Context context, boolean autoInitialize) {
@@ -122,20 +133,13 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
                               ContentProviderClient provider, SyncResult syncResult) {
         Log.i(TAG, "Beginning network synchronization");
         try {
-            final URL location = new URL(Constants.PROJECT_URI);
-            InputStream stream = null;
-
-            try {
-                Log.i(TAG, "Streaming data from network: " + location);
-                stream = downloadUrl(location);
-                updateLocalProjectData(stream, syncResult);
-                // Makes sure that the InputStream is closed after the app is
-                // finished using it.
-            } finally {
-                if (stream != null) {
-                    stream.close();
-                }
-            }
+            final String location = Constants.PROJECT_SYNC_URI + "?api_key=" + Constants.API_KEY;
+            JSONObject stream = null;
+            Log.i(TAG, "Streaming data from network: " + location);
+            stream = downloadUrl(location);
+            updateLocalProjectData(stream, syncResult);
+            // Makes sure that the InputStream is closed after the app is
+            // finished using it.
         } catch (MalformedURLException e) {
             Log.wtf(TAG, "Feed URL is malformed", e);
             syncResult.stats.numParseExceptions++;
@@ -164,7 +168,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.i(TAG, "Network synchronization complete");
     }
 
-    /**
+        /**
      * Read JSON from an input stream, storing it into the content provider.
      *
      * <p>This is where incoming data is persisted, committing the results of a sync. In order to
@@ -184,7 +188,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
      * (At this point, incoming database only contains missing items.)<br/>
      * 3. For any items remaining in incoming list, ADD to database.
      */
-    public void updateLocalProjectData(final InputStream stream, final SyncResult syncResult)
+    public void updateLocalProjectData(final JSONObject stream, final SyncResult syncResult)
             throws IOException, XmlPullParserException, RemoteException,
             OperationApplicationException, ParseException {
         final ProjectParser projectParser = new ProjectParser();
@@ -340,15 +344,27 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Given a string representation of a URL, sets up a connection and gets an input stream.
      */
-    private InputStream downloadUrl(final URL url) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setReadTimeout(NET_READ_TIMEOUT_MILLIS /* milliseconds */);
-        conn.setConnectTimeout(NET_CONNECT_TIMEOUT_MILLIS /* milliseconds */);
-        conn.setRequestMethod("GET");
-        conn.setDoInput(true);
-        // Starts the query
-        conn.connect();
-        return conn.getInputStream();
+    private JSONObject downloadUrl(final String url) throws IOException {
+        queue = Volley.newRequestQueue(getContext());
+        JsonObjectRequest req = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Log.i(TAG, response.toString(4));
+                            projectsjson = response;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("Error: ", error.getMessage());
+            }
+        });
+        queue.add(req);
+        return projectsjson;
     }
 
 

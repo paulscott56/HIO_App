@@ -45,6 +45,24 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
+        <service
+            android:name=".AuthenticatorService"
+            android:exported="true"
+            android:icon="@drawable/icon">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
+        <activity
+            android:name=".activities.AuthenticatorActivity"
+            android:label="@string/title_activity_authenticator" >
+        </activity>
+
         <!-- This implements the account we'll use as an attachment point for our SyncAdapter. Since
         our SyncAdapter doesn't need to authenticate the current user (it just fetches a public RSS
         feed), this account's implementation is largely empty.
