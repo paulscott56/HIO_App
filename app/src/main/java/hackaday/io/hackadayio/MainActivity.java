@@ -1,5 +1,7 @@
 package hackaday.io.hackadayio;
 
+import android.accounts.Account;
+import android.content.ContentResolver;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -13,6 +15,19 @@ public class MainActivity extends FragmentActivity implements FeedsFragment.OnFr
 
     private static final String TAG = "Main";
 
+    public static final String AUTHORITY = Constants.CONTENT_AUTHORITY;
+    // Account
+    public static final String ACCOUNT = Constants.ACCOUNT;
+    // Sync interval constants
+    public static final long SECONDS_PER_MINUTE = 60L;
+    public static final long SYNC_INTERVAL_IN_MINUTES = 60L;
+    public static final long SYNC_INTERVAL =
+            SYNC_INTERVAL_IN_MINUTES *
+                    SECONDS_PER_MINUTE;
+
+    ContentResolver mResolver;
+    Account mAccount;
+
     /**
      * The {@link ViewPager} that will host the section contents.
      */
@@ -22,6 +37,17 @@ public class MainActivity extends FragmentActivity implements FeedsFragment.OnFr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mResolver = getContentResolver();
+
+        /*
+         * Turn on periodic syncing
+         */
+        ContentResolver.addPeriodicSync(
+                mAccount,
+                AUTHORITY,
+                Bundle.EMPTY,
+                SYNC_INTERVAL);
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
