@@ -158,6 +158,7 @@ public class ProjectsFragment extends ListFragment {
                         null,
                         null,
                         null);
+        Toast.makeText(getActivity(), "Total projects to display " + cursor.getCount(), Toast.LENGTH_LONG).show();
         if (cursor.moveToFirst()) {
             do {
                 String avatar_url = cursor.getString(7);
