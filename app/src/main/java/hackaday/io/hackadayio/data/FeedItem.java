@@ -27,7 +27,8 @@ public class FeedItem {
         this.avatar = avatar;
     }
 
-    public FeedItem(String id, String screen_name, String updateType, String projectId, String user2Id, String postId, String summary, String userId, Bitmap bmp) {
+    public FeedItem(String id, String screen_name, String updateType, String projectId,
+                    String user2Id, String postId, String summary, String userId, Bitmap bmp) {
 
         this.id = id;
         this.screen_name = screen_name;

@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +41,7 @@ import hackaday.io.hackadayio.tasks.ImageLoaderTask;
  */
 public class FeedsFragment extends ListFragment {
 
-    private static final String TAG = "ListFrag";
+    private static final String TAG = "FeedsFrag";
     private int pageNumber = 1;
     private List<FeedItem> mItems;
     private ArrayList<FeedItem> feeds;
@@ -203,7 +202,7 @@ public class FeedsFragment extends ListFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            Log.i(TAG, response.toString(4));
+                            //Log.i(TAG, response.toString(4));
                             pname = response.getString("name");
                         } catch (JSONException e) {
                             e.printStackTrace();

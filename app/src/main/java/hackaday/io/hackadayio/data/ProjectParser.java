@@ -2,6 +2,8 @@ package hackaday.io.hackadayio.data;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -15,7 +17,35 @@ public class ProjectParser {
 
     public List<Entry> parse(JSONObject stream) {
         List<Entry> entries = new ArrayList<Entry>();
-
+        try {
+            JSONArray projects = stream.getJSONArray("projects");
+            for(int i = 0; i <= stream.length(); i++) {
+                Entry e = new Entry(projects.getJSONObject(i).getInt("id"),
+                        projects.getJSONObject(i).getString("url"),
+                        projects.getJSONObject(i).getInt("owner_id"),
+                        projects.getJSONObject(i).getString("name"),
+                        projects.getJSONObject(i).getString("summary"),
+                        projects.getJSONObject(i).getString("description"),
+                        projects.getJSONObject(i).getString("image_url"),
+                        projects.getJSONObject(i).getInt("views"),
+                        projects.getJSONObject(i).getInt("comments"),
+                        projects.getJSONObject(i).getInt("followers"),
+                        projects.getJSONObject(i).getInt("skulls"),
+                        projects.getJSONObject(i).getInt("logs"),
+                        projects.getJSONObject(i).getInt("details"),
+                        projects.getJSONObject(i).getInt("instruction"),
+                        projects.getJSONObject(i).getInt("components"),
+                        projects.getJSONObject(i).getInt("images"),
+                        projects.getJSONObject(i).getLong("created"),
+                        projects.getJSONObject(i).getInt("updated"),
+                        projects.getJSONObject(i).getString("tags")
+                );
+                entries.add(e);
+                Log.i(TAG, "adding entry " + e.toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return entries;
     }
 
@@ -29,7 +59,6 @@ public class ProjectParser {
      *
      */
     public static class Entry {
-        public final int id;
         public final int projectId;
         public final String url;
         public final int owner_id;
@@ -50,11 +79,11 @@ public class ProjectParser {
         public final int updated;
         public final String tags;
 
-        public Entry(int id, int projectId, String url, int owner_id, String name, String summary,
+        public Entry(int projectId, String url, int owner_id, String name, String summary,
                      String description, String image_url, int views, int comments, int followers,
                      int skulls, int logs, int details, int instruction, int components,
                      int images, long created, int updated, String tags) {
-            this.id = id;
+
             this.projectId = projectId;
             this.url = url;
             this.owner_id = owner_id;

@@ -15,10 +15,8 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
@@ -26,14 +24,14 @@ import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import hackaday.io.hackadayio.Constants;
 import hackaday.io.hackadayio.data.ProjectContract;
@@ -57,6 +55,9 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
      * Network read timeout, in milliseconds.
      */
     private static final int NET_READ_TIMEOUT_MILLIS = 10000;  // 10 seconds
+
+    private int projectPageNum = 1;
+    private int projectLastPage;
 
     /**
      * Project used when querying content provider. Returns all known fields.
@@ -133,13 +134,18 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
                               ContentProviderClient provider, SyncResult syncResult) {
         Log.i(TAG, "Beginning network synchronization");
         try {
-            final String location = Constants.PROJECT_SYNC_URI + "?api_key=" + Constants.API_KEY;
-            JSONObject stream = null;
-            Log.i(TAG, "Streaming data from network: " + location);
-            stream = downloadUrl(location);
-            updateLocalProjectData(stream, syncResult);
-            // Makes sure that the InputStream is closed after the app is
-            // finished using it.
+            int pages = getProjectPageNum(Constants.PROJECT_SYNC_URI + "?api_key=" + Constants.API_KEY);
+            // loop through all pages??? ugh!
+            for( int projectPageNum = 1; projectPageNum <= pages; projectPageNum++) {
+                final String location = Constants.PROJECT_SYNC_URI + "?api_key=" + Constants.API_KEY + "&page=" + projectPageNum;
+
+                Log.i(TAG, "Streaming datapage " + projectPageNum + " from network: " + location);
+                JSONObject stream = downloadUrl(location);
+                if(! stream.isNull("projects")) {
+                    updateLocalProjectData(stream, syncResult);
+                }
+                //projectPageNum += 1;
+            }
         } catch (MalformedURLException e) {
             Log.wtf(TAG, "Feed URL is malformed", e);
             syncResult.stats.numParseExceptions++;
@@ -309,7 +315,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
 
         // Add new items
         for (ProjectParser.Entry e : projectMap.values()) {
-            Log.i(TAG, "Scheduling insert: entry_id=" + e.id);
+            Log.i(TAG, "Scheduling insert: entry_id=" + e.projectId);
             batch.add(ContentProviderOperation.newInsert(ProjectContract.Entry.CONTENT_URI)
                     .withValue(ProjectContract.Entry.COLUMN_PROJECT_ID, e.projectId)
                     .withValue(ProjectContract.Entry.COLUMN_URL, e.url)
@@ -346,25 +352,42 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
      */
     private JSONObject downloadUrl(final String url) throws IOException {
         queue = Volley.newRequestQueue(getContext());
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            Log.i(TAG, response.toString(4));
-                            projectsjson = response;
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.e("Error: ", error.getMessage());
-            }
-        });
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+        JsonObjectRequest req = new JsonObjectRequest(url, null, future, future);
         queue.add(req);
+        try {
+            JSONObject response = future.get(30, TimeUnit.SECONDS);
+            projectsjson = response;
+            return projectsjson;
+        } catch (InterruptedException e) {
+            // exception handling
+        } catch (ExecutionException e) {
+            // exception handling
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
         return projectsjson;
+    }
+
+    private int getProjectPageNum(final String url) throws IOException {
+        queue = Volley.newRequestQueue(getContext());
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+        JsonObjectRequest req = new JsonObjectRequest(url, null, future, future);
+        queue.add(req);
+        try {
+            JSONObject response = future.get(30, TimeUnit.SECONDS);
+            projectLastPage = response.getInt("last_page");
+            return projectLastPage;
+        } catch (InterruptedException e) {
+            // exception handling
+        } catch (ExecutionException e) {
+            // exception handling
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return projectLastPage;
     }
 
 

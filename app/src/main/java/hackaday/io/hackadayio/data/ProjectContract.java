@@ -27,7 +27,7 @@ public class ProjectContract {
     /**
      * Path component for "entry"-type resources..
      */
-    private static final String PATH_ENTRIES = "projects";
+    public static final String PATH_ENTRIES = "projects";
 
     /**
      * Columns supported by "entries" records.
