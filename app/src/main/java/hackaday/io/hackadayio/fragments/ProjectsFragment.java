@@ -135,7 +135,7 @@ public class ProjectsFragment extends ListFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // remove the dividers from the ListView of the ListFragment
-        getListView().setDivider(null);
+        //getListView().setDivider(null);
     }
 
     @Override
@@ -170,6 +170,7 @@ public class ProjectsFragment extends ListFragment {
                     // do something meaningful
                     ProjectItem item = new ProjectItem();
                     item.setId(id);
+                    item.setName(name);
                     item.setAvatar(bmp);
                     item.setSummary(summary);
                     adapter.add(item);
