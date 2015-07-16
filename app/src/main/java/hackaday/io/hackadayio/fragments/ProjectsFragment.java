@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,14 +22,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import hackaday.io.hackadayio.Constants;
 import hackaday.io.hackadayio.R;
 import hackaday.io.hackadayio.data.ProjectContract;
 import hackaday.io.hackadayio.data.ProjectItem;
 import hackaday.io.hackadayio.data.ProjectsArrayAdapter;
-import hackaday.io.hackadayio.tasks.ImageLoaderTask;
+import hackaday.io.hackadayio.imagecache.ImageCacheManager;
 
 /**
  * Created by paul on 2015/07/10.
@@ -59,6 +57,7 @@ public class ProjectsFragment extends ListFragment {
             ProjectContract.Entry.COLUMN_CREATED,
             ProjectContract.Entry.COLUMN_UPDATED,
             ProjectContract.Entry.COLUMN_TAGS,
+            ProjectContract.Entry.COLUMN_IMAGE,
     };
 
     /**
@@ -116,15 +115,13 @@ public class ProjectsFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.projects_fragment, container, false);
-        //mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.activity_main_swipe_refresh_layout);
-        /*mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.activity_main_swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                pageNumber = 1;
-                initializeData();
-                mSwipeRefreshLayout.setRefreshing(false);
+                fetchProjects();
             }
-        });*/
+        });
 
         spinner = (ProgressBar) view.findViewById(R.id.progressBar1);
 
@@ -143,7 +140,7 @@ public class ProjectsFragment extends ListFragment {
         // retrieve theListView item
         ProjectItem item = mItems.get(position);
         // do something
-        Toast.makeText(getActivity(), item.id, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), item.getId(), Toast.LENGTH_SHORT).show();
     }
 
     public void initializeData() {
@@ -162,24 +159,21 @@ public class ProjectsFragment extends ListFragment {
         if (cursor.moveToFirst()) {
             do {
                 String avatar_url = cursor.getString(7);
-                AsyncTask<String, Void, Bitmap> imgData = new ImageLoaderTask(appContext).execute(avatar_url);
-                try {
-                    Bitmap bmp = imgData.get();
-                    int id = cursor.getInt(0);
-                    String name = cursor.getString(4);
-                    String summary = cursor.getString(5);
-                    // do something meaningful
-                    ProjectItem item = new ProjectItem();
-                    item.setId(id);
-                    item.setName(name);
-                    item.setAvatar(bmp);
-                    item.setSummary(summary);
-                    adapter.add(item);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
+                // AsyncTask<String, Void, Bitmap> imgData = new ImageLoaderTask(appContext).execute(avatar_url);
+                //String bmpbyte = cursor.getString(20);
+
+                Bitmap bmp = ImageCacheManager.getInstance().getBitmap(avatar_url);
+
+                int id = cursor.getInt(0);
+                String name = cursor.getString(4);
+                String summary = cursor.getString(5);
+                // do something meaningful
+                ProjectItem item = new ProjectItem();
+                item.setId(id);
+                item.setName(name);
+                item.setAvatar(bmp);
+                item.setSummary(summary);
+                adapter.add(item);
             } while (cursor.moveToNext());
         }
     }

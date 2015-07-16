@@ -113,5 +113,7 @@ public class ProjectContract {
         public static final String COLUMN_UPDATED = "updated";
 
         public static final String COLUMN_TAGS  = "tags";
+
+        public static final String COLUMN_IMAGE = "image";
     }
 }

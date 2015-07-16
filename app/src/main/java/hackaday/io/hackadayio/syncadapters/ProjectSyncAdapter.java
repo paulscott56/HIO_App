@@ -83,6 +83,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
             ProjectContract.Entry.COLUMN_CREATED,
             ProjectContract.Entry.COLUMN_UPDATED,
             ProjectContract.Entry.COLUMN_TAGS,
+            ProjectContract.Entry.COLUMN_IMAGE,
     };
 
     // Constants representing column positions from PROJECTION.
@@ -106,9 +107,10 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final int COLUMN_CREATED = 17;
     public static final int COLUMN_UPDATED = 18;
     public static final int COLUMN_TAGS = 19;
+    public static final int COLUMN_IMAGE = 20;
+
     private JSONObject projectsjson;
     private RequestQueue queue;
-
 
     public ProjectSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -201,7 +203,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
         final ContentResolver contentResolver = getContext().getContentResolver();
 
         Log.i(TAG, "Parsing stream as JSON");
-        final List<ProjectParser.Entry> entries = projectParser.parse(stream);
+        final List<ProjectParser.Entry> entries = projectParser.parse(stream, getContext());
         Log.i(TAG, "Parsing complete. Found " + entries.size() + " entries");
 
 
@@ -241,6 +243,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
         long created;
         int updated;
         String tags;
+        byte[] image;
 
         while (c.moveToNext()) {
             syncResult.stats.numEntries++;
@@ -264,6 +267,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
             created = c.getLong(COLUMN_CREATED);
             updated = c.getInt(COLUMN_UPDATED);
             tags = c.getString(COLUMN_TAGS);
+            image = c.getBlob(COLUMN_IMAGE);
 
             ProjectParser.Entry match = projectMap.get(projectId);
             if (match != null) {
@@ -271,7 +275,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
                 projectMap.remove(projectId);
                 // Check to see if the entry needs to be updated
                 Uri existingUri = ProjectContract.Entry.CONTENT_URI.buildUpon()
-                        .appendPath(Integer.toString(id)).build();
+                        .appendPath(Integer.toString(projectId)).build();
                 if ((match.name != null && !match.name.equals(name)) ||
                         (match.url != null && !match.url.equals(url)) ||
                         (match.created != created)) {
@@ -297,6 +301,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
                             .withValue(ProjectContract.Entry.COLUMN_CREATED, created)
                             .withValue(ProjectContract.Entry.COLUMN_UPDATED, updated)
                             .withValue(ProjectContract.Entry.COLUMN_TAGS, tags)
+                            .withValue(ProjectContract.Entry.COLUMN_IMAGE, image)
                             .build());
                     syncResult.stats.numUpdates++;
                 } else {
@@ -305,7 +310,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
             } else {
                 // Entry doesn't exist. Remove it from the database.
                 Uri deleteUri = ProjectContract.Entry.CONTENT_URI.buildUpon()
-                        .appendPath(Integer.toString(id)).build();
+                        .appendPath(Integer.toString(projectId)).build();
                 Log.i(TAG, "Scheduling delete: " + deleteUri);
                 batch.add(ContentProviderOperation.newDelete(deleteUri).build());
                 syncResult.stats.numDeletes++;
@@ -336,6 +341,7 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
                     .withValue(ProjectContract.Entry.COLUMN_CREATED, e.created)
                     .withValue(ProjectContract.Entry.COLUMN_UPDATED, e.updated)
                     .withValue(ProjectContract.Entry.COLUMN_TAGS, e.tags)
+                    .withValue(ProjectContract.Entry.COLUMN_IMAGE, e.image)
                     .build());
             syncResult.stats.numInserts++;
         }
@@ -389,7 +395,4 @@ public class ProjectSyncAdapter extends AbstractThreadedSyncAdapter {
         }
         return projectLastPage;
     }
-
-
-
 }

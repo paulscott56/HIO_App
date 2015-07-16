@@ -5,6 +5,7 @@ import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
@@ -15,6 +16,8 @@ import android.view.MenuItem;
 
 import hackaday.io.hackadayio.activities.AuthenticatorActivity;
 import hackaday.io.hackadayio.fragments.FeedsFragment;
+import hackaday.io.hackadayio.imagecache.ImageCacheManager;
+import hackaday.io.hackadayio.imagecache.RequestManager;
 
 public class MainActivity extends FragmentActivity implements FeedsFragment.OnFragmentInteractionListener {
 
@@ -48,10 +51,16 @@ public class MainActivity extends FragmentActivity implements FeedsFragment.OnFr
      */
     ViewPager mViewPager;
 
+    private static int DISK_IMAGECACHE_SIZE = 1024*1024*10;
+    private static Bitmap.CompressFormat DISK_IMAGECACHE_COMPRESS_FORMAT = Bitmap.CompressFormat.PNG;
+    private static int DISK_IMAGECACHE_QUALITY = 100;  //PNG is lossless so quality is ignored but must be provided
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        init();
 
         mAccount = CreateSyncAccount(this);
         Intent authact = new Intent(this, AuthenticatorActivity.class);
@@ -154,5 +163,23 @@ public class MainActivity extends FragmentActivity implements FeedsFragment.OnFr
                 b);                                      // Extras
     }
 
+    /**
+     * Intialize the request manager and the image cache
+     */
+    private void init() {
+        RequestManager.init(this);
+        createImageCache();
+    }
 
+    /**
+     * Create the image cache. Uses Memory Cache by default. Change to Disk for a Disk based LRU implementation.
+     */
+    private void createImageCache() {
+        ImageCacheManager.getInstance().init(this,
+                this.getPackageCodePath()
+                , DISK_IMAGECACHE_SIZE
+                , DISK_IMAGECACHE_COMPRESS_FORMAT
+                , DISK_IMAGECACHE_QUALITY
+                , ImageCacheManager.CacheType.DISK);
+    }
 }

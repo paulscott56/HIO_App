@@ -195,7 +195,7 @@ public class ProjectProvider extends ContentProvider {
         /** SQL statement to create "entry" table. */
         private static final String SQL_CREATE_ENTRIES =
                 "CREATE TABLE " + ProjectContract.Entry.TABLE_NAME + " (" +
-                        ProjectContract.Entry._ID + " INTEGER PRIMARY KEY," +
+                        ProjectContract.Entry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         ProjectContract.Entry.COLUMN_PROJECT_ID + TYPE_INTEGER + COMMA_SEP +
                         ProjectContract.Entry.COLUMN_URL    + TYPE_TEXT + COMMA_SEP +
                         ProjectContract.Entry.COLUMN_OWNER_ID + TYPE_INTEGER + COMMA_SEP +
@@ -214,7 +214,8 @@ public class ProjectProvider extends ContentProvider {
                         ProjectContract.Entry.COLUMN_IMAGES + TYPE_INTEGER + COMMA_SEP +
                         ProjectContract.Entry.COLUMN_CREATED + TYPE_INTEGER + COMMA_SEP +
                         ProjectContract.Entry.COLUMN_UPDATED + TYPE_INTEGER + COMMA_SEP +
-                        ProjectContract.Entry.COLUMN_TAGS + TYPE_TEXT +
+                        ProjectContract.Entry.COLUMN_TAGS + TYPE_TEXT + COMMA_SEP +
+                        ProjectContract.Entry.COLUMN_IMAGE +
                         ")";
 
         /** SQL statement to drop "entry" table. */

@@ -4,12 +4,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
+import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-
-import hackaday.io.hackadayio.R;
 
 /**
  * Created by paul on 2015/07/13.
@@ -32,13 +31,21 @@ public class ImageLoaderTask extends AsyncTask<String, Void, Bitmap> {
             String imageurl = urls[0];
 
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context.getApplicationContext())
+                    .memoryCache(new WeakMemoryCache())
+                    .denyCacheImageMultipleSizesInMemory()
+                    //.discCache(new UnlimitedDiscCache(cacheDir))
+                    //.imageDownloader(new URLConnectionImageDownloader(120 * 1000, 120 * 1000))
+                    //.enableLogging()
                     .threadPoolSize(1)
                     .build();
-            ImageLoader.getInstance().init(config);
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            if(!imageLoader.isInited()) {
+                imageLoader.init(config);
+            }
+
             ImageLoader imgLoader = ImageLoader.getInstance();
 
             DisplayImageOptions options = new DisplayImageOptions.Builder()
-                    .showStubImage(R.drawable.icon)
                     .cacheOnDisc()
                     .resetViewBeforeLoading()
                     .bitmapConfig(Bitmap.Config.RGB_565)

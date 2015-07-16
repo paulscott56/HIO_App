@@ -1,6 +1,12 @@
 package hackaday.io.hackadayio.data;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,18 +15,34 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import hackaday.io.hackadayio.imagecache.ImageCacheManager;
+
 /**
  * Created by paul on 2015/07/14.
  */
 public class ProjectParser {
     private static final String TAG = "ProjectParser";
+    private RequestQueue queue;
+    private Context appContext;
+    private Bitmap bmp;
+    private byte[] bmpArr;
+    private ImageLoader mImageLoader;
 
-    public List<Entry> parse(JSONObject stream) {
+    public List<Entry> parse(JSONObject stream, Context appContext) {
+        this.appContext = appContext;
         List<Entry> entries = new ArrayList<Entry>();
         try {
             JSONArray projects = stream.getJSONArray("projects");
             for(int i = 0; i <= stream.length(); i++) {
-                Entry e = new Entry(projects.getJSONObject(i).getInt("id"),
+                // download the image
+
+                queue = Volley.newRequestQueue(appContext);
+                //Initialising ImageDownloader
+                Bitmap dinges = ImageCacheManager.getInstance().getBitmap(projects.getJSONObject(i).getString("image_url"));
+                //bmpArr = DbBitmapUtility.getBytes(dinges);
+
+                Entry e = new Entry(
+                        projects.getJSONObject(i).getInt("id"),
                         projects.getJSONObject(i).getString("url"),
                         projects.getJSONObject(i).getInt("owner_id"),
                         projects.getJSONObject(i).getString("name"),
@@ -38,7 +60,8 @@ public class ProjectParser {
                         projects.getJSONObject(i).getInt("images"),
                         projects.getJSONObject(i).getLong("created"),
                         projects.getJSONObject(i).getInt("updated"),
-                        projects.getJSONObject(i).getString("tags")
+                        projects.getJSONObject(i).getString("tags"),
+                        bmpArr
                 );
                 entries.add(e);
                 Log.i(TAG, "adding entry " + e.toString());
@@ -78,11 +101,12 @@ public class ProjectParser {
         public final long created;
         public final int updated;
         public final String tags;
+        public final byte[] image;
 
         public Entry(int projectId, String url, int owner_id, String name, String summary,
                      String description, String image_url, int views, int comments, int followers,
                      int skulls, int logs, int details, int instruction, int components,
-                     int images, long created, int updated, String tags) {
+                     int images, long created, int updated, String tags, byte[] image) {
 
             this.projectId = projectId;
             this.url = url;
@@ -103,6 +127,7 @@ public class ProjectParser {
             this.created = created;
             this.updated = updated;
             this.tags = tags;
+            this.image = image;
         }
     }
 }
