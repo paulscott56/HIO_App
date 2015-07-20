@@ -14,10 +14,12 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.crashlytics.android.Crashlytics;
 import hackaday.io.hackadayio.activities.AuthenticatorActivity;
 import hackaday.io.hackadayio.fragments.FeedsFragment;
 import hackaday.io.hackadayio.imagecache.ImageCacheManager;
 import hackaday.io.hackadayio.imagecache.RequestManager;
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends FragmentActivity implements FeedsFragment.OnFragmentInteractionListener {
 
@@ -58,6 +60,7 @@ public class MainActivity extends FragmentActivity implements FeedsFragment.OnFr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
         init();
