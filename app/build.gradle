@@ -44,4 +44,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
         transitive = true;
     }
+    compile 'com.github.amlcurran.showcaseview:library:5.0.0'
+
+
 }
