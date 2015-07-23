@@ -9,6 +9,8 @@ public class Constants {
     public static final String FEED_URL = FEED_URI + "?api_key=" + API_KEY + "&page=";
     public static final String PROJECT_URI = "https://api.hackaday.io/v1/projects/";
     public static final String PROJECT_SYNC_URI = "https://api.hackaday.io/v1/projects";
+    public static final String USERS_URI = "https://api.hackaday.io/v1/users/";
+    public static final String USERS_SYNC_URI = "https://api.hackaday.io/v1/users";
 
     public static final String CLIENT_ID = "3aih05g8fGJmCQpnVdXIb8rpN5iGFH9LdhJmK6G0dfeqQS0D";
     public static final String CLIENT_SECRET ="Z13hZo6tHeJFsBF9uWF9bwCukdLRIT5DqCwoJv580XymflLT";
@@ -27,4 +29,5 @@ public class Constants {
     public static final String CONTENT_AUTHORITY = "hackaday.io.hackadayio";
 
 
+    public static final String USER_CONTENT_AUTHORITY = "hackaday.io.hackadayio.users";
 }
